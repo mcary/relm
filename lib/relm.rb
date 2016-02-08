@@ -1,24 +1,18 @@
 module RElm
-  # foldp: takes a function (see update), an initial_state, and a signal
-  # that merges all the relevant inputs to the program
   def foldp(func, initial_state, signal)
     Foldp.new(func, initial_state, signal)
-  end # returns signal of displayable
+  end
 
-  # map: takes a function (see view) and a signal of models, and returns
-  # a signal of displayable representations
   def map(func, signal)
     Map.new(func, signal)
-  end # returns signal of model
+  end
 
-  # run: takes a signal of displayable representations and evaluates it
-  # repeatedly as signals change value
   def run(signal)
     display = proc {|value| puts value }
     loop do
       display.call(signal.next)
     end
-  end # never returns
+  end
 end
 
 require_relative 'relm/foldp'

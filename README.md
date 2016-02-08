@@ -15,27 +15,36 @@ The top-level flow of most programs would be expressed as:
 
 Where the program provides:
 
-* view: proc takes a model (a representation of program's current
-  state) and returns a displayable representation
-* update: proc takes a model and the current value of an input signal
-  and returns a model
-  for the next state of the program
-* initial_state: the starting model
-* merged_signals: inputs from sources relevant to the program
+* `view`: A proc that takes a model (representing the program's
+  current state) and returns a displayable representation
+* `update`: A proc that takes a model (representing the program's
+  previous state) and the current value of an input signal.  It returns
+  a model (representing the program's new current state).
+* `initial_state`: The starting model that represents the program's state
+* `merged_signals`: Inputs from sources relevant to the program
+
+The model most be immutable; `update` should create a *new* model,
+optionally with structural sharing.
 
 The library provides:
 
-* map: takes a function (see view) and a signal of models, and returns
-  a signal of displayable representations
-* foldp: takes a function (see update), an initial_state, and a signal
-  that merges all the relevant inputs to the program
-* run: takes a signal of displayable representations and evaluates it
-  repeatedly as signals change value
+* `map`: Takes a function (see `view`) and a signal, and returns a
+  signal whose values are the result of calling the function on each
+  value of the input signal
+* `foldp`: Takes a function (see `update`), an `initial_state`, and a
+  signal that merges all the relevant inputs to the program.  Returns
+  a signal that is initially `initial_state` and subsequently the
+  result of calling the function on the previous state and the value
+  of the input signal
+* `run`: Takes a signal of displayable representations and evaluates it
+  repeatedly, displaying the value as it changes
 
 Example
 -------
     
-    def view(model)
+You can run this example in example.rb:
+
+    view = proc do |model|
       model.choices.map do |choice|
         if model.selected?(choice)
           "[#{choice}]"
@@ -45,7 +54,7 @@ Example
       end.join(" ")
     end
 
-    def update(model, signal_value)
+    update = proc do |model, signal_value|
       case signal_value
       when :left then model.shift_left
       when :right then model.shift_right
@@ -56,7 +65,7 @@ Example
     class MyModel < Struct.new(:selection, :choices)
       def initialize(*args)
         super
-        raise unless choices.include? selection
+        raise ArgumentError unless choices.include? selection
       end
 
       def shift_left
@@ -66,15 +75,31 @@ Example
       def shift_right
         shift +1
       end
-   
+
+      def selected?(choice)
+        choice == selection
+      end
+
       private
 
       def shift(amt)
-        new_selection = (choices.index(selection) + amt) % choices.length
+        new_index = (choices.index(selection) + amt) % choices.length
+        new_selection = choices[new_index]
         self.class.new(new_selection, choices)
       end 
     end
 
-    model = MyModel.new(:a, [:a, :b, :c, :d])
+    initial_state = MyModel.new(:a, [:a, :b, :c, :d])
 
-    merged_signals = Keyboard.arrows
+Next Steps
+----------
+
+* Provide more built-in signals
+* Implement `RElm::merge`, which takes two signals and combines them
+  into one using something like `IO.select`
+* Allow `run` to take an optional `displayer` proc to display the
+  current displayable representation.  Currently run always just calls
+  `puts`, but it could update an UI and repaint, for example.
+* Setup Gemfile and .gemspec
+* Ruby-ify the API a bit more, for example by moving funtion callbacks
+  to last position so they can accept a block more easily

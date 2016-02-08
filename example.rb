@@ -53,4 +53,3 @@ include RElm
 merged_signals = Keyboard.arrows
 program = map(view, foldp(update, initial_state, merged_signals))
 run(program)
-
