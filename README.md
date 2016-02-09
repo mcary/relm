@@ -91,6 +91,18 @@ You can run this example in example.rb:
 
     initial_state = MyModel.new(:a, [:a, :b, :c, :d])
 
+Program Design Tips
+-------------------
+
+* Functions should be pure in that they return the same value for the same
+  inputs with no visible side-effects
+* Functions can "cheat" with side-effects such as logging
+* Try to keep as much of your logic in these functions.  They are easier to
+  test and reason about with referential transparency.  Keep the signals on the
+  periphery.
+* Avoid mutating data structures.  Use a library like Hampster for structural
+  sharing if efficiency is an issue.
+
 Next Steps
 ----------
 
@@ -103,3 +115,10 @@ Next Steps
 * Setup Gemfile and .gemspec
 * Ruby-ify the API a bit more, for example by moving funtion callbacks
   to last position so they can accept a block more easily
+* Illustate benefits to testability
+* Short-circuit recomputation when signal values are unchanged
+* Add support for async, but with an initial value
+* Add support for external APIs (IO-bound, like HTTP requests), either via
+  async or a special callback-based API.
+* A way to bind new signals to UI elements (like channels?)
+* Explore: JSON pushed over websocket as the displayable model
