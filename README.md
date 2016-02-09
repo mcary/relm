@@ -2,7 +2,9 @@ RElm - Functional-Reactive programming for Ruby
 ===============================================
 
 RElm is a library for the functional-reactive style of programming,
-inspired by the Elm programming language, which targets that style.
+inspired by the [Elm][1] programming language, which targets that style.
+
+[1]: http://elm-lang.org/
 
 Program Structure
 -----------------
@@ -98,10 +100,12 @@ Program Design Tips
   inputs with no visible side-effects
 * Functions can "cheat" with side-effects such as logging
 * Try to keep as much of your logic in these functions.  They are easier to
-  test and reason about with referential transparency.  Keep the signals on the
-  periphery.
+  test and reason about with [referential transparency][2].  Keep the signals
+  on the periphery.
 * Avoid mutating data structures.  Use a library like Hampster for structural
   sharing if efficiency is an issue.
+
+[2]: https://en.wikipedia.org/wiki/Referential_transparency
 
 Next Steps
 ----------
